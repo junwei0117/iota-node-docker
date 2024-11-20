@@ -1,0 +1,5 @@
+iota_config
+key-pairs*
+validator.info
+genesis.blob
+validator.yaml
