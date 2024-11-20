@@ -3,6 +3,7 @@ services:
     image: iotaledger/iota-node:testnet
     ports:
       - "8080:8080"
+      - "8081:8081"
       - "8084:8084/udp"
       - "9000:9000"
       - "9184:9184"

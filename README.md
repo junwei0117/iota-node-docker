@@ -1,6 +1,20 @@
-# IOTA Validator Setup Guide
+# IOTA Validator Setup Guide - Testnet
 
 This guide walks you through the essential steps to set up an IOTA validator node.\
+
+## Required Network Ports
+
+Ensure the following ports are open in your firewall:
+
+| Port       | Reachability      | Purpose                           |
+|------------|-------------------|-----------------------------------|
+| TCP/8080   | inbound          | protocol/transaction interface     |
+| TCP/8081   | inbound/outbound | primary interface                 |
+| UDP/8084   | inbound/outbound | peer to peer state sync interface |
+| TCP/8443   | outbound         | metrics pushing                   |
+| TCP/9184   | localhost        | metrics scraping                  |
+
+> **Note**: Maybe you already noticed that port 8081 is using TCP, which conflicts with docs.iota.org and validator.info as well. This is a known bug, but the node is actually communicating via TCP.
 
 ## Setup Steps
 
@@ -69,13 +83,30 @@ docker compose up -d
 docker compose logs -f
 ```
 
-### 7. Prepare for Committee Membership
+### 7. Register as a Validator Candidate
+
+We will obtain some tokens from the faucet for gas fees.
+
+```bash
+./become_candidate.sh
+```
+
+### 8. Request Delegation from IOTA Foundation
+
+1. Get your validator address by running:
+
+```bash
+docker run --rm -v ./iota_config:/root/.iota/iota_config iotaledger/iota-tools:testnet  /bin/sh -c "/usr/local/bin/iota client active-address"
+```
+
+2. Copy the output address
+3. Contact the IOTA Foundation with your validator address
+
+### 9. Join the committee
 
 Before joining the committee, ensure:
 - Your node is fully synced with the network
-- You have at least 2M IOTA tokens in your validator address
-
-### 8. Join the Committee
+- IOTA Foundation has already delegated the staking tokens for your validator
 
 Once your node is ready, submit your request to join the committee:
 
@@ -83,10 +114,10 @@ Once your node is ready, submit your request to join the committee:
 ./join_committee.sh
 ```
 
-### 9. Monitor Validator Status
+### 10. Monitor Validator Status
 
 ```bash
-docker run --rm -v ./iota_config:/root/.iota/iota_config -v ./validator.info:/iota/validator.info iotaledger/iota-tools:testnet /bin/sh -c "/usr/local/bin/iota validator display-metadata" | grep status
+docker run --rm -v ./iota_config:/root/.iota/iota_config iotaledger/iota-tools:testnet /bin/sh -c "/usr/local/bin/iota validator display-metadata" | grep status
 ```
 
 You should see your node's status is `pending` now, it will become active and join the committee starting from next epoch.

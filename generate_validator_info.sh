@@ -20,7 +20,8 @@ fi
 
 mkdir -p ./key-pairs
 mkdir -p ./iota_config
-mkdir -p ./tmp/key-pairs-for-making-info
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+mkdir -p "./tmp/key-pairs-for-making-info_${TIMESTAMP}"
 
 KEYGEN_OUTPUT=$(docker run --rm iotaledger/iota-tools:testnet /bin/sh -c '/usr/local/bin/iota keytool generate ed25519 --json && cat *.key')
 
@@ -64,21 +65,15 @@ read -p "Enter image URL (press enter for default): " IMAGE_URL
 read -p "Enter project URL (press enter for default): " PROJECT_URL
 read -p "Enter hostname: " HOST_NAME
 
-# Set defaults if empty
 IMAGE_URL=${IMAGE_URL:-""}
 PROJECT_URL=${PROJECT_URL:-""}
 
-docker run --rm -v ./iota_config:/root/.iota/iota_config -v ./tmp/key-pairs-for-making-info:/iota iotaledger/iota-tools:testnet /bin/sh -c "RUST_BACKTRACE=full /usr/local/bin/iota validator make-validator-info \"$NAME\" \"$DESCRIPTION\" \"$IMAGE_URL\" \"$PROJECT_URL\" \"$HOST_NAME\" 1000"
+docker run --rm -v ./iota_config:/root/.iota/iota_config -v "./tmp/key-pairs-for-making-info_${TIMESTAMP}":/iota iotaledger/iota-tools:testnet /bin/sh -c "RUST_BACKTRACE=full /usr/local/bin/iota validator make-validator-info \"$NAME\" \"$DESCRIPTION\" \"$IMAGE_URL\" \"$PROJECT_URL\" \"$HOST_NAME\" 1000"
 
-cp ./tmp/key-pairs-for-making-info/account.key ./key-pairs/account.key
-cp ./tmp/key-pairs-for-making-info/network.key ./key-pairs/network.key
-cp ./tmp/key-pairs-for-making-info/protocol.key ./key-pairs/protocol.key
-
-docker run --rm iotaledger/iota-tools:testnet /bin/sh -c '/usr/local/bin/iota keytool generate bls12381 --json && cat *.key' | \
-    tail -n1 > ./key-pairs/authority.key 2>/dev/null
-
-mv ./tmp/key-pairs-for-making-info/validator.info .
+cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/account.key" ./key-pairs/account.key
+cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/network.key" ./key-pairs/network.key
+cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/protocol.key" ./key-pairs/protocol.key
+cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/authority.key" ./key-pairs/authority.key
+cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/validator.info" .
 
 echo "Your validator address is ${IOTA_ADDRESS}"
-
-rm -rf tmp
