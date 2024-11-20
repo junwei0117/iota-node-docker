@@ -62,14 +62,35 @@ Generate the necessary key pairs for your validator, the key pairs will be store
 
 > **Important**: Back up your generated keys securely. Loss of these keys could result in loss of access to your validator.
 
-### 6. Run your node up
+### 6. Start Your Validator Node
 
 ```bash
 docker compose up -d
+docker compose logs -f
 ```
 
-### 7. After your node is fully sync and running, you can send request to join the committee
+### 7. Prepare for Committee Membership
+
+Before joining the committee, ensure:
+- Your node is fully synced with the network
+- You have at least 2M IOTA tokens in your validator address
+
+### 8. Join the Committee
+
+Once your node is ready, submit your request to join the committee:
 
 ```bash
 ./join_committee.sh
+```
+
+### 9. Monitor Validator Status
+
+```bash
+docker run --rm -v ./iota_config:/root/.iota/iota_config -v ./validator.info:/iota/validator.info iotaledger/iota-tools:testnet /bin/sh -c "/usr/local/bin/iota validator display-metadata" | grep status
+```
+
+You should see your node's status is `pending` now, it will become active and join the committee starting from next epoch.
+
+```
+<YOUR-VALUDATOR_ADDRESS>'s validator status: Pending
 ```

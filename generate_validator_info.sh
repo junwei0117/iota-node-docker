@@ -36,7 +36,7 @@ keystore:
   File: /root/.iota/iota_config/iota.keystore
 envs:
   - alias: custom
-    rpc: "https://api.iota-rebased-alphanet.iota.cafe"
+    rpc: "https://api.testnet.iota.cafe"
     ws: ~
     basic_auth: ~
 active_env: custom
@@ -70,17 +70,9 @@ PROJECT_URL=${PROJECT_URL:-""}
 
 docker run --rm -v ./iota_config:/root/.iota/iota_config -v ./tmp/key-pairs-for-making-info:/iota iotaledger/iota-tools:testnet /bin/sh -c "RUST_BACKTRACE=full /usr/local/bin/iota validator make-validator-info \"$NAME\" \"$DESCRIPTION\" \"$IMAGE_URL\" \"$PROJECT_URL\" \"$HOST_NAME\" 1000"
 
-PROTOCOL_PRIVATE_KEY=$(cat ./tmp/key-pairs-for-making-info/protocol.key)
-docker run --rm iotaledger/iota-tools:testnet /bin/sh -c "/usr/local/bin/iota keytool convert $PROTOCOL_PRIVATE_KEY --json" | \
-    grep '"base64WithFlag":' | cut -d'"' -f4 > ./key-pairs/protocol.key
-
-ACCOUNT_PRIVATE_KEY=$(cat ./tmp/key-pairs-for-making-info/account.key)
-docker run --rm iotaledger/iota-tools:testnet /bin/sh -c "/usr/local/bin/iota keytool convert $ACCOUNT_PRIVATE_KEY --json" | \
-    grep '"base64WithFlag":' | cut -d'"' -f4 > ./key-pairs/account.key
-
-NETWORK_PRIVATE_KEY=$(cat ./tmp/key-pairs-for-making-info/network.key)
-docker run --rm iotaledger/iota-tools:testnet /bin/sh -c "/usr/local/bin/iota keytool convert $NETWORK_PRIVATE_KEY --json" | \
-    grep '"base64WithFlag":' | cut -d'"' -f4 > ./key-pairs/network.key
+cp ./tmp/key-pairs-for-making-info/account.key ./key-pairs/account.key
+cp ./tmp/key-pairs-for-making-info/network.key ./key-pairs/network.key
+cp ./tmp/key-pairs-for-making-info/protocol.key ./key-pairs/protocol.key
 
 docker run --rm iotaledger/iota-tools:testnet /bin/sh -c '/usr/local/bin/iota keytool generate bls12381 --json && cat *.key' | \
     tail -n1 > ./key-pairs/authority.key 2>/dev/null
