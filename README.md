@@ -76,14 +76,26 @@ Generate the necessary key pairs for your validator, the key pairs will be store
 
 > **Important**: Back up your generated keys securely. Loss of these keys could result in loss of access to your validator.
 
-### 6. Start Your Validator Node
+### 6. Request Delegation from IOTA Foundation
+
+After running `./generate_validator_info.sh`, you'll receive output similar to this:
+
+```
+Validator Address: 0xa8769934bf4fa35eb8fa8313beeb1756258e165dcd265239536ac396c26fa676
+Script Version: 5d47a55
+```
+
+1. Contact the IOTA Foundation team in the appropriate validator channel
+2. Provide your validator details and wait for confirmation
+
+### 7. Start Your Validator Node
 
 ```bash
 docker compose up -d
 docker compose logs -f
 ```
 
-### 7. Register as a Validator Candidate
+### 8. Register as a Validator Candidate
 
 We will obtain some tokens from the faucet for gas fees.
 
@@ -91,7 +103,7 @@ We will obtain some tokens from the faucet for gas fees.
 ./become_candidate.sh
 ```
 
-### 8. Request Delegation from IOTA Foundation
+### 9. Request Delegation from IOTA Foundation
 
 1. Get your validator address by running:
 
@@ -102,7 +114,7 @@ docker run --rm -v ./iota_config:/root/.iota/iota_config iotaledger/iota-tools:t
 2. Copy the output address
 3. Contact the IOTA Foundation with your validator address
 
-### 9. Join the committee
+### 10. Join the committee
 
 Before joining the committee, ensure:
 - Your node is fully synced with the network

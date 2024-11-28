@@ -76,4 +76,7 @@ cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/protocol.key" ./key-pairs/proto
 cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/authority.key" ./key-pairs/authority.key
 cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/validator.info" .
 
-echo "Your validator address is ${IOTA_ADDRESS}"
+echo -e "\nPlease share the following information in Slack:"
+echo -e "\nValidator Address: ${IOTA_ADDRESS}"
+echo "Script Version: $(git rev-parse --short HEAD)"
+echo -e "\nMake sure to securely store your key files!\n"
