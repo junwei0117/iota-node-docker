@@ -126,7 +126,7 @@ Once your node is ready, submit your request to join the committee:
 ./join_committee.sh
 ```
 
-### 10. Monitor Validator Status
+### 11. Monitor Validator Status
 
 ```bash
 docker run --rm -v ./iota_config:/root/.iota/iota_config iotaledger/iota-tools:testnet /bin/sh -c "/usr/local/bin/iota validator display-metadata" | grep status
