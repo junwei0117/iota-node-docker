@@ -114,7 +114,7 @@ We will obtain some tokens from the faucet for gas fees.
 
 ### 8. Request Delegation from IOTA Foundation
 
-Contact the IOTA Foundation with your validator information obtained in Step 6
+Contact the IOTA Foundation with your validator information obtained in Step 5
 
 ### 9. Join the committee
 
