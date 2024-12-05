@@ -1,5 +1,15 @@
 #!/bin/bash
 
+IOTA_DOCKER_IMAGE=${IOTA_TOOLS_DOCKER_IMAGE:-"iotaledger/iota-tools:testnet"}
+API_URL=${IOTA_API_ENDPOINT:-"https://api.testnet.iota.cafe"}
+
+echo "Will using ${API_URL} for iota_config API endpopint"
+
+./check_iota_services.sh --api ${API_URL} --docker ${IOTA_DOCKER_IMAGE}
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+
 if ! command -v jq &> /dev/null; then
     echo "jq is not installed. Installing jq..."
     apt update && apt install -y jq
@@ -23,7 +33,7 @@ mkdir -p ./iota_config
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 mkdir -p "./tmp/key-pairs-for-making-info_${TIMESTAMP}"
 
-KEYGEN_OUTPUT=$(docker run --rm iotaledger/iota-tools:testnet /bin/sh -c '/usr/local/bin/iota keytool generate ed25519 --json && cat *.key')
+KEYGEN_OUTPUT=$(docker run --rm ${IOTA_DOCKER_IMAGE} /bin/sh -c '/usr/local/bin/iota keytool generate ed25519 --json && cat *.key')
 
 JSON_PART=$(echo "$KEYGEN_OUTPUT" | head -n-1)
 
@@ -37,7 +47,7 @@ keystore:
   File: /root/.iota/iota_config/iota.keystore
 envs:
   - alias: custom
-    rpc: "https://api.testnet.iota.cafe"
+    rpc: "${API_URL}"
     ws: ~
     basic_auth: ~
 active_env: custom
@@ -68,7 +78,7 @@ read -p "Enter hostname: " HOST_NAME
 IMAGE_URL=${IMAGE_URL:-""}
 PROJECT_URL=${PROJECT_URL:-""}
 
-docker run --rm -v ./iota_config:/root/.iota/iota_config -v "./tmp/key-pairs-for-making-info_${TIMESTAMP}":/iota iotaledger/iota-tools:testnet /bin/sh -c "RUST_BACKTRACE=full /usr/local/bin/iota validator make-validator-info \"$NAME\" \"$DESCRIPTION\" \"$IMAGE_URL\" \"$PROJECT_URL\" \"$HOST_NAME\" 1000"
+docker run --rm -v ./iota_config:/root/.iota/iota_config -v "./tmp/key-pairs-for-making-info_${TIMESTAMP}":/iota ${IOTA_DOCKER_IMAGE} /bin/sh -c "RUST_BACKTRACE=full /usr/local/bin/iota validator make-validator-info \"$NAME\" \"$DESCRIPTION\" \"$IMAGE_URL\" \"$PROJECT_URL\" \"$HOST_NAME\" 1000"
 
 cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/account.key" ./key-pairs/account.key
 cp "./tmp/key-pairs-for-making-info_${TIMESTAMP}/network.key" ./key-pairs/network.key

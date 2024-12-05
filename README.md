@@ -16,6 +16,16 @@ Ensure the following ports are open in your firewall:
 
 > **Note**: Maybe you already noticed that port 8081 is using TCP, which conflicts with docs.iota.org and validator.info as well. This is a known bug, but the node is actually communicating via TCP.
 
+## Environment Variables (Optional)
+
+These environment variables are pre-configured for the testnet. You typically don't need to modify them unless you're using custom endpoints.
+
+```bash
+export IOTA_API_ENDPOINT="https://api.testnet.iota.cafe"
+export IOTA_FAUCET_ENDPOINT="https://faucet.testnet.iota.cafe/v1/gas"
+export IOTA_TOOLS_DOCKER_IMAGE="iotaledger/iota-tools:testnet"
+```
+
 ## Setup Steps
 
 ### 1. Download Configuration Template
@@ -66,6 +76,8 @@ p2p-config:
 curl -fLJO https://dbfiles.testnet.iota.cafe/genesis.blob
 ```
 
+> **Note**: The URL is for the IOTA Testnet only.
+
 ### 5. Make validator.info and Generate Validator Keys
 
 Generate the necessary key pairs for your validator, the key pairs will be stored in `key-pairs` folder.
@@ -74,10 +86,6 @@ Generate the necessary key pairs for your validator, the key pairs will be store
 ./generate_validator_info.sh
 ```
 
-> **Important**: Back up your generated keys securely. Loss of these keys could result in loss of access to your validator.
-
-### 6. Request Delegation from IOTA Foundation
-
 After running `./generate_validator_info.sh`, you'll receive output similar to this:
 
 ```
@@ -85,17 +93,18 @@ Validator Address: 0xa8769934bf4fa35eb8fa8313beeb1756258e165dcd265239536ac396c26
 Script Version: 5d47a55
 ```
 
-1. Contact the IOTA Foundation team in the appropriate validator channel
-2. Provide your validator details and wait for confirmation
+Copy this validator information and save it for later use in step 8, where you'll need to provide it to the IOTA Foundation when requesting delegation.
 
-### 7. Start Your Validator Node
+> **Important**: Back up your generated keys securely. Loss of these keys could result in loss of access to your validator.
+
+### 6. Start Your Validator Node
 
 ```bash
 docker compose up -d
 docker compose logs -f
 ```
 
-### 8. Register as a Validator Candidate
+### 7. Register as a Validator Candidate
 
 We will obtain some tokens from the faucet for gas fees.
 
@@ -103,18 +112,11 @@ We will obtain some tokens from the faucet for gas fees.
 ./become_candidate.sh
 ```
 
-### 9. Request Delegation from IOTA Foundation
+### 8. Request Delegation from IOTA Foundation
 
-1. Get your validator address by running:
+Contact the IOTA Foundation with your validator information obtained in Step 6
 
-```bash
-docker run --rm -v ./iota_config:/root/.iota/iota_config iotaledger/iota-tools:testnet  /bin/sh -c "/usr/local/bin/iota client active-address"
-```
-
-2. Copy the output address
-3. Contact the IOTA Foundation with your validator address
-
-### 10. Join the committee
+### 9. Join the committee
 
 Before joining the committee, ensure:
 - Your node is fully synced with the network
@@ -126,7 +128,7 @@ Once your node is ready, submit your request to join the committee:
 ./join_committee.sh
 ```
 
-### 11. Monitor Validator Status
+### 10. Monitor Validator Status
 
 ```bash
 docker run --rm -v ./iota_config:/root/.iota/iota_config iotaledger/iota-tools:testnet /bin/sh -c "/usr/local/bin/iota validator display-metadata" | grep status
